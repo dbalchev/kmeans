@@ -44,7 +44,7 @@ class cosineDistanceTest(unittest.TestCase):
 
     def test_euclidean_similarity(self):
         tests = [
-            ([], [1,2,3], 1 - sqrt(1/3), "Empty sequence"),
+            ([], [1,2,3], 0, "Empty sequence"),
             ([1, 2, 3], [1, 2, 3], 1, "Same sequence"),
             ([1, 1, 1], [1, 1, 1], 1, "Same sequnece repeating elements"),
             ([1], [2], 0, "Nonintersecting sequences"),

@@ -36,7 +36,12 @@ def mutual_information_distance(lh, rh):
         - 0.5 * self_information(merge(lh, rh))
 
 def euclidean_similarity(lh, rh):
+    lh_norm = lh.norm or 1
+    rh_norm = rh.norm or 1
     sq  = lambda x: x * x
-    return 1 - sqrt(sum([sq(abs(lh[k]-rh[k])) for k in set(chain(lh.keys(), rh.keys()))]))
+    key_set = set(chain(lh.keys(), rh.keys()))
+    # l_norm  = len(lh) / len(key_set)
+    # r_norm  = len(rh) / len(key_set)
+    return 1 - sqrt(sum([sq(abs(lh[k]/lh_norm-rh[k]/rh_norm)) for k in key_set]))
 
 default_similarity = cosine_similarity
