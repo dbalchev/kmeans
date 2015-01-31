@@ -22,20 +22,20 @@ from glob import iglob
 from itertools import islice, chain
 from kmeans import clusterize
 
-files = list(islice(iglob("./reuters/training/*"), 50))
-clusters = clusterize(5, files)
+files = list(islice(iglob("./reuters/training/*"), 1000))
+clusters = clusterize(10, files)
 print('======================')
 for cluster_name, cluster in clusters.items():
-	print('Cluster Name:',cluster_name)
-	for item in cluster.items:
-		print('\t',item.name)
-
-items = list(chain.from_iterable(cluster.items for cluster in clusters.values()))
-import csv
-with open("results.csv", "w") as csv_file:
-    writer = csv.DictWriter(csv_file, ["name"] + [item.name for item in items])
-    writer.writeheader()
-    for cu_item in items:
-        d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
-        d["name"] = cu_item.name
-        writer.writerow(d)
+	print(cluster_name, "has", len(cluster.items), "docs")
+	# for item in cluster.items:
+	# 	print('\t',item.name)
+#
+# items = list(chain.from_iterable(cluster.items for cluster in clusters.values()))
+# import csv
+# with open("results.csv", "w") as csv_file:
+#     writer = csv.DictWriter(csv_file, ["name"] + [item.name for item in items])
+#     writer.writeheader()
+#     for cu_item in items:
+#         d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
+#         d["name"] = cu_item.name
+#         writer.writerow(d)

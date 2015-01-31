@@ -93,4 +93,4 @@ class Vectorizer:
             if token.isalpha() and token not in self.stopwords)
 
     def vectorize_file(self, filename):
-        return self.vectorize_seq(tokenize(filename))
+        return list(self.vectorize_seq(tokenize(filename)))

@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
 from collections import defaultdict
 from copy import deepcopy
+from itertools import chain
 import random
 
 from .distances import default_similarity
 from .utils import Vectorizer, WeightedMap, merge
 
-
+MIN_TEXT_LEN = 10
 class Centroid:
     """
     Клас, който ще представлява всеки центроид направен във клъстерите,
@@ -29,13 +30,14 @@ class FileRepr:
         self.content = weighted_map
 
 
-def fill_initial_clusters(cores, corpus, similarity):
+def get_initial_clusters(cores, corpus, old_cluster, similarity):
     """
     Функция създаваща началните стойности нa клъстерите,
     като всеки от тях представлява центроид и ще преизчисли
     центровете на всеки центроид преди да приключи.
     """
     clusters = {core.name: Centroid(core.content) for core in cores}
+    changed = False
     for item in corpus:
         max_similarity = (-1, None)
         for label, cluster in clusters.items():
@@ -46,12 +48,14 @@ def fill_initial_clusters(cores, corpus, similarity):
         if max_similarity[1] is None:
             raise Exception('Similarity function not working correctly.')
 
+        if old_cluster and max_similarity[1] != old_cluster[item.name]:
+            changed = True
         clusters[max_similarity[1]].items.append(item)
 
     for cluster in clusters.values():
         cluster.centralize()
 
-    return clusters
+    return clusters, changed
 
 
 def kmeans(n_clusters, text_seq, similarity=default_similarity):
@@ -61,38 +65,27 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
     вектор върнат от Vectorizer
     similarity = similarity or default_similarity
     """
-    corpus         = [FileRepr(label, WeightedMap(list(sorted(text)))) for label, text in text_seq]
+    corpus         = [FileRepr(label, WeightedMap(list(sorted(text)))) for label, text in text_seq if len(text) >= MIN_TEXT_LEN]
     cores          = random.sample(corpus, n_clusters)
-    clusters       = fill_initial_clusters(cores, corpus, similarity)
+    clusters, _    = get_initial_clusters(cores, corpus, None, similarity)
     changed        = True
     iteration      = 0
     max_iterations = 1000
-    while changed or iteration > max_iterations:
-        changed = False
-        # todo: change new_clusters to be newly generated
-        new_clusters = deepcopy(clusters)
-        for label, cluster in clusters.items():
-            for item in cluster.items:
-                max_similarity = (similarity(item.content, cluster.center), None)
-                for inn_label, inn_cluster in clusters.items():
-                    if label == inn_label:
-                        continue
+    while changed and iteration <= max_iterations:
 
-                    cur_similarity = similarity(inn_cluster.center, item.content)
-                    if cur_similarity > max_similarity[0]:
-                        max_similarity = (cur_similarity, inn_label)
-                        changed = True
+        # if iteration == max_iterations:
+        #     print('======================')
+        #     for cluster_name, cluster in clusters.items():
+        #     	print('Cluster Name:',cluster_name)
+        #     	for item in cluster.items:
+        #     		print('\t',item.name)
 
-                if max_similarity[1] is not None:
-                    new_clusters[label].items.remove(item)
-                    new_clusters[max_similarity[1]].items.append(item)
-
-        clusters = new_clusters
-        for cluster in clusters.values():
-            cluster.centralize()
-
+        old_cluster = dict(chain.from_iterable(\
+            ((item.name, label) for item in cluster.items) for label, cluster in clusters.items()))
+        clusters, changed = get_initial_clusters([FileRepr(name, cluster.center) \
+            for name, cluster in clusters.items()], corpus, old_cluster, similarity)
         iteration += 1
-
+    print("done in", iteration, "iters")
     return clusters
 
 
