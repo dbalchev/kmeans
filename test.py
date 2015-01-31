@@ -23,6 +23,10 @@ from itertools import islice
 from kmeans import clusterize
 
 files = list(islice(iglob("./reuters/training/*"), 15))
-print(clusterize(3, files))
-
+clusters = clusterize(3, files)
+print('======================')
+for cluster_name, cluster in clusters.items():
+	print('Cluster Name:',cluster_name)
+	for item in cluster.items:
+		print('\t',item.name)
 

@@ -7,7 +7,7 @@ from .distances import default_similarity
 from .utils import Vectorizer, WeightedMap, merge
 
 
-class Centroid(object):
+class Centroid:
     """
     Клас, който ще представлява всеки центроид направен във клъстерите,
     той ще се инициализира със ядрото което е подбрано от популацията,
@@ -20,7 +20,13 @@ class Centroid(object):
         self.items  = []
 
     def centralize(self):
-        self.center = merge(*self.items)
+        self.center = merge(*[item.content for item in self.items])
+
+
+class FileRepr:
+    def __init__(self, file_label, weighted_map):
+        self.name    = file_label
+        self.content = weighted_map
 
 
 def fill_initial_clusters(cores, corpus, similarity):
@@ -29,18 +35,18 @@ def fill_initial_clusters(cores, corpus, similarity):
     като всеки от тях представлява центроид и ще преизчисли
     центровете на всеки центроид преди да приключи.
     """
-    clusters = {core[0]: Centroid(core[1]) for core in cores}
+    clusters = {core.name: Centroid(core.content) for core in cores}
     for item in corpus:
-        max_similarity = (0, None)
+        max_similarity = (-1, None)
         for label, cluster in clusters.items():
-            cur_similarity = similarity(cluster.center, item[1])
+            cur_similarity = similarity(cluster.center, item.content)
             if cur_similarity > max_similarity[0]:
                 max_similarity = (cur_similarity, label)
 
         if max_similarity[1] is None:
             raise Exception('Similarity function not working correctly.')
 
-        clusters[max_similarity[1]].items.append(item[1])
+        clusters[max_similarity[1]].items.append(item)
 
     for cluster in clusters.values():
         cluster.centralize()
@@ -55,28 +61,37 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
     вектор върнат от Vectorizer
     similarity = similarity or default_similarity
     """
-    corpus        = [(label, WeightedMap(list(sorted(text)))) for label, text in text_seq]
-    cores         = random.sample(corpus, n_clusters)
-    clusters      = fill_initial_clusters(cores, corpus, similarity)
-    changed       = True
-    while changed:
+    corpus         = [FileRepr(label, WeightedMap(list(sorted(text)))) for label, text in text_seq]
+    cores          = random.sample(corpus, n_clusters)
+    clusters       = fill_initial_clusters(cores, corpus, similarity)
+    changed        = True
+    iteration      = 0
+    max_iterations = 100
+    while changed or iteration > max_iterations:
         changed = False
+        # todo: change new_clusters to be newly generated
         new_clusters = deepcopy(clusters)
         for label, cluster in clusters.items():
             for item in cluster.items:
-                max_similarity = (similarity(item[1], cluster.center), None)
+                max_similarity = (similarity(item.content, cluster.center), None)
                 for inn_label, inn_cluster in clusters.items():
-                    cur_similarity = similarity(inn_cluster.center, item[1])
+                    if label == inn_label:
+                        continue
+
+                    cur_similarity = similarity(inn_cluster.center, item.content)
                     if cur_similarity > max_similarity[0]:
                         max_similarity = (cur_similarity, inn_label)
                         changed = True
 
-                new_clusters[label].items.remove(item[1])
-                new_clusters[max_similarity[1]].items.append(item[1])
+                if max_similarity[1] is not None:
+                    new_clusters[label].items.remove(item)
+                    new_clusters[max_similarity[1]].items.append(item)
 
         clusters = new_clusters
         for cluster in clusters.values():
             cluster.centralize()
+
+        iteration += 1
 
     return clusters
 
