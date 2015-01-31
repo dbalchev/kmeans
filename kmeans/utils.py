@@ -24,16 +24,14 @@ def count_duplicates(lst, indx):
         cnt += 1
     return cnt
 
-def merge(lh, rh):
-    if len(lh) == 0:
-        return rh
-    if len(rh) == 0:
-        return lh
+def merge(*args):
+    args = [x for x in args if len(x)]
     result = WeightedMap([])
-    for key, weight in lh.items():
-        result[key] = weight * 0.5
-    for key, weight in rh.items():
-        result[key] += weight * 0.5
+    if not args:
+        return result
+    for wm in args:
+        for key, weight in wm.items():
+            result[key] += weight / len(args)
     norm = 0
     for w in result.values():
         norm += w * w
