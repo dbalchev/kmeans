@@ -25,7 +25,7 @@ def count_duplicates(lst, indx):
     cnt   = 1
     elem  = lst[indx]
     indx += 1
-    while indx < len(lst) and lst[indx] == el:
+    while indx < len(lst) and lst[indx] == elem:
         indx += 1
         cnt  += 1
     return cnt
