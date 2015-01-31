@@ -66,7 +66,7 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
     clusters       = fill_initial_clusters(cores, corpus, similarity)
     changed        = True
     iteration      = 0
-    max_iterations = 100
+    max_iterations = 1000
     while changed or iteration > max_iterations:
         changed = False
         # todo: change new_clusters to be newly generated
