@@ -51,11 +51,11 @@ def self_information(wm):
         si -= p * log(p, 2)
     return si
 
-class WeightedMap(defaultdict):
+class WeightedMap(dict):
     def __init__(self, vec):
         self.norm = 0
         if len(vec) == 0:
-            super().__init__(float)
+            super().__init__()
         else:
             def gen():
                 cu = 0
@@ -66,8 +66,10 @@ class WeightedMap(defaultdict):
                     self.norm += p * p
                     yield vec[cu], p
                     cu += cnt
-            super().__init__(float, gen())
+            super().__init__(gen())
 
+    def __missing__(self, key):
+        return 0.0
 
 
 class Prenum(dict):
