@@ -11,8 +11,18 @@ v1, v2 = (WeightedMap(sorted(v)) for v in (v1, v2))
 # print(v2)
 
 
-print(cosine_distance(v1, v2))
-print(mutual_information_distance(v1, v1))
-print(mutual_information_distance(v1, v2))
-print(mutual_information_distance(v1, WeightedMap([1,2,3])))
-print(mutual_information_distance(WeightedMap([1,2,3]), WeightedMap([1,2,3])))
+# print(cosine_distance(v1, v2))
+# print(mutual_information_distance(v1, v1))
+# print(mutual_information_distance(v1, v2))
+# print(mutual_information_distance(v1, WeightedMap([1,2,3])))
+# print(mutual_information_distance(WeightedMap([1,2,3]), WeightedMap([1,2,3])))
+
+# Testing kmeans
+from glob import iglob
+from itertools import islice
+from kmeans import clusterize
+
+files = list(islice(iglob("./reuters/training/*"), 15))
+print(clusterize(3, files))
+
+

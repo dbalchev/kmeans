@@ -29,10 +29,10 @@ def fill_initial_clusters(cores, corpus, similarity):
     като всеки от тях представлява центроид и ще преизчисли
     центровете на всеки центроид преди да приключи.
     """
-    clusters = {core[0]: Centroid(core) for core in cores}
+    clusters = {core[0]: Centroid(core[1]) for core in cores}
     for item in corpus:
         max_similarity = (0, None)
-        for label, cluster in clusters.iteritems():
+        for label, cluster in clusters.items():
             cur_similarity = similarity(cluster.center, item[1])
             if cur_similarity > max_similarity[0]:
                 max_similarity = (cur_similarity, label)
@@ -40,7 +40,7 @@ def fill_initial_clusters(cores, corpus, similarity):
         if max_similarity[1] is None:
             raise Exception('Similarity function not working correctly.')
 
-        clusters[max_similarity[1]].items.append(item)
+        clusters[max_similarity[1]].items.append(item[1])
 
     for cluster in clusters.values():
         cluster.centralize()
@@ -71,14 +71,15 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
                         max_similarity = (cur_similarity, inn_label)
                         changed = True
 
-                new_clusters[label].items.remove(item)
-                new_clusters[max_similarity[1]].items.append(item)
+                new_clusters[label].items.remove(item[1])
+                new_clusters[max_similarity[1]].items.append(item[1])
 
         clusters = new_clusters
         for cluster in clusters.values():
             cluster.centralize()
 
-    raise NotImplementedError
+    return clusters
+
 
 def clusterize(n_clusters, filename_seq, similarity=default_similarity):
     vec = Vectorizer()
