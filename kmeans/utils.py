@@ -1,6 +1,6 @@
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from stopwords import STOPWORDS
+from .stopwords import STOPWORDS
 stemmer = WordNetLemmatizer()
 
 
@@ -12,6 +12,15 @@ def stem(s):
 def tokenize(filename):
     with open(filename) as inp:
         return (stem(token) for token in word_tokenize(inp.read(-1)))
+
+def count_duplicates(lst, indx):
+    cnt = 1
+    el = lst[indx]
+    indx += 1
+    while indx < len(lst) and lst[indx] == el:
+        indx += 1
+        cnt += 1
+    return cnt
 
 class Prenum(dict):
     def __init__(self):

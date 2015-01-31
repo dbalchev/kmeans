@@ -1,5 +1,5 @@
 from kmeans.utils import Vectorizer
-import kmeans
+# import kmeans
 
 vectorizer = Vectorizer()
 file1, file2 = "reuters/training/1", "reuters/training/5"
