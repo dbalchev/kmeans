@@ -33,7 +33,7 @@ def count_duplicates(lst, indx):
 
 def merge(*args):
     args = [x for x in args if len(x)]
-    result = WeightedMap([])
+    result = WeightedMap.from_vec([])
     if not args:
         return result
     for wm in args:
@@ -52,21 +52,26 @@ def self_information(wm):
     return si
 
 class WeightedMap(dict):
-    def __init__(self, vec):
+    def __init__(self, tupple_iterator):
         self.norm = 0
+        super().__init__(tupple_iterator)
+        self.norm = 0
+        for w in self.values():
+            self.norm += w * w
+
+    @staticmethod
+    def from_vec(vec):
         if len(vec) == 0:
-            super().__init__()
-        else:
-            def gen():
-                cu = 0
-                denominator = len(vec)
-                while cu < len(vec):
-                    cnt = count_duplicates(vec, cu)
-                    p = cnt / denominator
-                    self.norm += p * p
-                    yield vec[cu], p
-                    cu += cnt
-            super().__init__(gen())
+            return WeightedMap(())
+        def gen():
+            cu = 0
+            denominator = len(vec)
+            while cu < len(vec):
+                cnt = count_duplicates(vec, cu)
+                p = cnt / denominator
+                yield vec[cu], p
+                cu += cnt
+        return WeightedMap(gen())
 
     def __missing__(self, key):
         return 0.0

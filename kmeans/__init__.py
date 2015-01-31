@@ -65,7 +65,7 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
     вектор върнат от Vectorizer
     similarity = similarity or default_similarity
     """
-    corpus         = [FileRepr(label, WeightedMap(list(sorted(text)))) for label, text in text_seq if len(text) >= MIN_TEXT_LEN]
+    corpus         = [FileRepr(label, WeightedMap.from_vec(list(sorted(text)))) for label, text in text_seq if len(text) >= MIN_TEXT_LEN]
     cores          = random.sample(corpus, n_clusters)
     clusters, _    = get_initial_clusters(cores, corpus, None, similarity)
     changed        = True

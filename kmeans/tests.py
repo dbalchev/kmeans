@@ -22,7 +22,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1, 1, 1, 2], {1:0.75, 2:0.25}),
         ]
         for vec, m in tests:
-            self.assertEqual(WeightedMap(vec), m)
+            self.assertEqual(WeightedMap.from_vec(vec), m)
 
     def test_dot(self):
         tests = [
@@ -35,7 +35,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1,1,1,1], [2,2,2], 0, "")
         ]
         for lh, rh, result, message in tests:
-            lh, rh = map(WeightedMap, (lh, rh))
+            lh, rh = map(WeightedMap.from_vec, (lh, rh))
             r1 = dot_product(lh, rh)
             r2 = dot_product(rh, lh)
             message = message or "{}, {}".format(lh, rh)
@@ -53,7 +53,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1,1,1,1], [2,2,2], 0, "")
         ]
         for lh, rh, result, message in tests:
-            lh, rh = map(WeightedMap, (lh, rh))
+            lh, rh = map(WeightedMap.from_vec, (lh, rh))
             r1 = euclidean_similarity(lh, rh)
             r2 = euclidean_similarity(rh, lh)
             message = message or "{}, {}".format(lh, rh)
@@ -71,7 +71,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1,1,1,1], [2,2,2], 1, "")
         ]
         for lh, rh, result, message in tests:
-            lh, rh = map(WeightedMap, (lh, rh))
+            lh, rh = map(WeightedMap.from_vec, (lh, rh))
             r1 = cosine_distance(lh, rh)
             r2 = cosine_distance(rh, lh)
             message = message or "{}, {}".format(lh, rh)
@@ -86,7 +86,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1,3,5], [2,4,6], [1,2,3,4,5,6])
         ]
         for lh, rh, result in tests:
-            lh, rh, result = map(WeightedMap, (lh, rh, result))
+            lh, rh, result = map(WeightedMap.from_vec, (lh, rh, result))
             r1 = merge(lh, rh)
             r2 = merge(rh, lh)
             message = "{}, {}".format(lh, rh)
@@ -101,7 +101,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1, 2], 1)
         ]
         for test, result in tests:
-            test = WeightedMap(test)
+            test = WeightedMap.from_vec(test)
             r = self_information(test)
             message = "{}".format(test)
             self.assertEqual(r, result, message)

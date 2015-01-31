@@ -5,7 +5,7 @@ from kmeans.distances import cosine_similarity, mutual_information_distance, euc
 vectorizer = Vectorizer()
 file1, file2 = "reuters/training/1", "reuters/training/5"
 v1, v2 = (list(vectorizer.vectorize_file(f)) for f in (file1, file2))
-v1, v2 = (WeightedMap(sorted(v)) for v in (v1, v2))
+v1, v2 = (WeightedMap.from_vec(sorted(v)) for v in (v1, v2))
 
 # print(v1)
 # print(v2)
@@ -14,8 +14,8 @@ v1, v2 = (WeightedMap(sorted(v)) for v in (v1, v2))
 # print(cosine_distance(v1, v2))
 # print(mutual_information_distance(v1, v1))
 # print(mutual_information_distance(v1, v2))
-# print(mutual_information_distance(v1, WeightedMap([1,2,3])))
-# print(mutual_information_distance(WeightedMap([1,2,3]), WeightedMap([1,2,3])))
+# print(mutual_information_distance(v1, WeightedMap.from_vec([1,2,3])))
+# print(mutual_information_distance(WeightedMap.from_vec([1,2,3]), WeightedMap.from_vec([1,2,3])))
 
 # Testing kmeans
 from glob import iglob
