@@ -19,8 +19,14 @@ def cosine_distance(lh, rh):
         return 0
     return 1 - dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
 
+def cosine_similarity(lh, rh):
+    """
+    Изчислява similarity използвайки 1 - cosine_distance
+    """
+    return 1 - cosine_distance(lh, rh)
+
 def mutual_information_distance(lh, rh):
     return self_information(lh) + self_information(rh) \
         - 0.5 * self_information(merge(lh, rh))
 
-default_similarity = cosine_distance
+default_similarity = cosine_similarity
