@@ -17,6 +17,7 @@ def cosine_distance(lh, rh):
 
     if not lh.norm or not rh.norm:
         return 0
+<<<<<<< HEAD
     return 1 - dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
 
 def mutual_information_distance(lh, rh):
@@ -24,3 +25,7 @@ def mutual_information_distance(lh, rh):
         - 0.5 * self_information(merge(lh, rh))
 
 default_similarity = cosine_distance
+=======
+    nominator = dot_product(lh, rh)
+    return 1 - nominator / denominator
+>>>>>>> 961af1c4b0d9ef08274accd23a74c550050868bc
