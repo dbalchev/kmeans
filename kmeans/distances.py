@@ -1,4 +1,4 @@
-from .utils import count_duplicates, self_information, merge
+from .utils import count_duplicates, self_information, merge, WeightedMap
 from math import sqrt
 
 def dot_product(lh, rh):
@@ -23,6 +23,10 @@ def cosine_similarity(lh, rh):
     """
     Изчислява similarity използвайки 1 - cosine_distance
     """
+    if not isinstance(lh, WeightedMap):
+        raise ValueError("lh is not a WeightedMap")
+    if not isinstance(rh, WeightedMap):
+        raise ValueError("rh is not a WeightedMap")
     return 1 - cosine_distance(lh, rh)
 
 def mutual_information_distance(lh, rh):
