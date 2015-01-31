@@ -1,45 +1,26 @@
-from .utils import count_duplicates
+from .utils import count_duplicates, self_information, merge
 from math import sqrt
 
-def get_norm_len(vec):
-    cu = 0
-    res = 0
-    while cu < len(vec):
-        cnt = count_duplicates(vec, cu)
-        res += cnt * cnt
-        cu += cnt
-    return res
-
 def dot_product(lh, rh):
+    if len(lh) > len(rh):
+        lh, rh = rh, lh
     result = 0
-    if len(lh) == 0 or len(rh) == 0:
-        return 0
-    li = 0
-    ri = 0
-    while li < len(lh) or ri < len(rh):
-        if li < len(lh) and (ri >= len(rh) or lh[li] < rh[ri]):
-            cnt = count_duplicates(lh, li)
-            li += cnt
-            continue
-        if ri < len(rh) and (li >= len(lh) or lh[li] > rh[ri]):
-            cnt = count_duplicates(rh, ri)
-            ri += cnt
-            continue
-        left_count = count_duplicates(lh, li)
-        right_count = count_duplicates(rh, ri)
-        result += left_count * right_count
-        li += left_count
-        ri += right_count
+    for l_word, l_weight in lh.items():
+        result += l_weight * rh[l_word]
     return result
 
-def euclidean_distance(lh, rh):
+def cosine_distance(lh, rh):
     """
     Прави нормализирано евклидово разстояние на lh и rh;
     lh и rh трябва да са сортиран вектор от индекси на думи
     """
 
-    denominator = sqrt(get_norm_len(lh) * get_norm_len(rh))
-    if not denominator:
+    if not lh.norm or not rh.norm:
         return 0
-    nominator = dot_product(lh, rh)
-    return 1 - nominator / denominator
+    return 1 - dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
+
+def mutual_information_distance(lh, rh):
+    return self_information(lh) + self_information(rh) \
+        - 0.5 * self_information(merge(lh, rh))
+
+default_similarity = cosine_distance

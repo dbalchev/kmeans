@@ -1,9 +1,16 @@
-from kmeans.utils import Vectorizer
+from kmeans.utils import Vectorizer, WeightedMap
+from kmeans.distances import cosine_distance, mutual_information_distance
 # import kmeans
 
 vectorizer = Vectorizer()
 file1, file2 = "reuters/training/1", "reuters/training/5"
 v1, v2 = (list(vectorizer.vectorize_file(f)) for f in (file1, file2))
+v1, v2 = (WeightedMap(sorted(v)) for v in (v1, v2))
 
-print(v1)
-print(v2)
+print(cosine_distance(v1, v2))
+# print(mutual_information_distance(v1, v1))
+# print(mutual_information_distance(v1, v2))
+# print(mutual_information_distance(v1, [1,2,3]))
+# print(mutual_information_distance([1,2,3], [1,2,3]))
+# print(v1)
+# print(v2)
