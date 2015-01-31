@@ -1,9 +1,10 @@
+# -*- coding: UTF-8 -*-
 from collections import defaultdict
 from copy import deepcopy
 import random
 
 from .distances import default_similarity
-from .utils import Vectorizer
+from .utils import Vectorizer, WeightedMap, merge
 
 
 class Centroid(object):
@@ -15,22 +16,11 @@ class Centroid(object):
     средно аритметично.
     """
     def __init__(self, center):
-        self.center = self.convert_to_weighted_map([center])
+        self.center = center
         self.items  = []
 
-    def convert_to_weighted_map(self, center_list):
-        result = defaultdict(int)
-        cu = 0
-        for center in center_list:
-            denominator = len(center) * len(center_list)
-            while cu < len(center):
-                cnt = count_duplicates(center, cu)
-                result[center[cu]] = cnt / denominator
-                cu += cnt
-        return result
-
     def centralize(self):
-        self.center = self.convert_to_weighted_map(self.items)
+        self.center = merge(*self.items)
 
 
 def fill_initial_clusters(cores, corpus, similarity):
@@ -65,7 +55,7 @@ def kmeans(n_clusters, text_seq, similarity=default_similarity):
     вектор върнат от Vectorizer
     similarity = similarity or default_similarity
     """
-    corpus        = [(label, list(sorted(text))) for label, text in text_seq]
+    corpus        = [(label, WeightedMap(list(sorted(text)))) for label, text in text_seq]
     cores         = random.sample(corpus, n_clusters)
     clusters      = fill_initial_clusters(cores, corpus, similarity)
     changed       = True

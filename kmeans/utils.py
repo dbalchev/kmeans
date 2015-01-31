@@ -6,23 +6,30 @@ from collections import defaultdict
 stemmer = WordNetLemmatizer()
 
 
-# за да работи трябва да се рънне python -m nltk.downloader -d <<хубава директория>> wordnet
-def stem(s):
-    return stemmer.lemmatize(s)
+def stem(string):
+    """
+    За да работи трябва да се рънне python -m nltk.downloader -d <<хубава директория>> wordnet
+    """
+    return stemmer.lemmatize(string)
 
-# за да работи трябва да се рънне python -m nltk.downloader -d <<хубава директория>> punkt
+
 def tokenize(filename):
+    """
+    За да работи трябва да се рънне python -m nltk.downloader -d <<хубава директория>> punkt
+    """
     with open(filename) as inp:
         return (stem(token) for token in word_tokenize(inp.read(-1)))
 
+
 def count_duplicates(lst, indx):
-    cnt = 1
-    el = lst[indx]
+    cnt   = 1
+    elem  = lst[indx]
     indx += 1
     while indx < len(lst) and lst[indx] == el:
         indx += 1
-        cnt += 1
+        cnt  += 1
     return cnt
+
 
 def merge(*args):
     args = [x for x in args if len(x)]
