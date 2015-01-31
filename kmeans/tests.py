@@ -1,8 +1,9 @@
+from math import sqrt
 import unittest
 
-from .utils import count_duplicates
-from .distances import cosine_distance, dot_product, merge, self_information
-from .utils import WeightedMap
+from .distances import cosine_distance, dot_product, merge, self_information, euclidean_similarity
+from .utils import count_duplicates, WeightedMap
+
 
 class cosineDistanceTest(unittest.TestCase):
     def test_count_dup(self):
@@ -37,6 +38,24 @@ class cosineDistanceTest(unittest.TestCase):
             lh, rh = map(WeightedMap, (lh, rh))
             r1 = dot_product(lh, rh)
             r2 = dot_product(rh, lh)
+            message = message or "{}, {}".format(lh, rh)
+            self.assertEqual(r1, r2, message)
+            self.assertEqual(r1, result, message)
+
+    def test_euclidean_similarity(self):
+        tests = [
+            ([], [1,2,3], 1 - sqrt(1/3), "Empty sequence"),
+            ([1, 2, 3], [1, 2, 3], 1, "Same sequence"),
+            ([1, 1, 1], [1, 1, 1], 1, "Same sequnece repeating elements"),
+            ([1], [2], 0, "Nonintersecting sequences"),
+            ([1, 3, 5], [2, 4, 6], 0, "Nonintersecting longer sequences"),
+            ([1, 2], [1, 3], 0.5, ""),
+            ([1,1,1,1], [2,2,2], 0, "")
+        ]
+        for lh, rh, result, message in tests:
+            lh, rh = map(WeightedMap, (lh, rh))
+            r1 = euclidean_similarity(lh, rh)
+            r2 = euclidean_similarity(rh, lh)
             message = message or "{}, {}".format(lh, rh)
             self.assertEqual(r1, r2, message)
             self.assertEqual(r1, result, message)

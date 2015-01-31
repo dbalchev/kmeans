@@ -1,5 +1,7 @@
-from .utils import count_duplicates, self_information, merge, WeightedMap
+from itertools import chain
 from math import sqrt
+
+from .utils import count_duplicates, self_information, merge, WeightedMap
 
 def dot_product(lh, rh):
     if len(lh) > len(rh):
@@ -32,5 +34,9 @@ def cosine_similarity(lh, rh):
 def mutual_information_distance(lh, rh):
     return self_information(lh) + self_information(rh) \
         - 0.5 * self_information(merge(lh, rh))
+
+def euclidean_similarity(lh, rh):
+    sq  = lambda x: x * x
+    return 1 - sqrt(sum([sq(abs(lh[k]-rh[k])) for k in set(chain(lh.keys(), rh.keys()))]))
 
 default_similarity = cosine_similarity

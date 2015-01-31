@@ -1,5 +1,5 @@
 from kmeans.utils import Vectorizer, WeightedMap
-from kmeans.distances import cosine_similarity, mutual_information_distance
+from kmeans.distances import cosine_similarity, mutual_information_distance, euclidean_similarity
 # import kmeans
 
 vectorizer = Vectorizer()
@@ -39,3 +39,9 @@ for cluster_name, cluster in clusters.items():
 #         d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
 #         d["name"] = cu_item.name
 #         writer.writerow(d)
+
+files = list(islice(iglob("./reuters/training/*"), 1000))
+clusters = clusterize(10, files, similarity=euclidean_similarity)
+print('======================')
+for cluster_name, cluster in clusters.items():
+	print(cluster_name, "has", len(cluster.items), "docs")
