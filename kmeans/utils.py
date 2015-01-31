@@ -25,6 +25,10 @@ def count_duplicates(lst, indx):
     return cnt
 
 def merge(lh, rh):
+    if len(lh) == 0:
+        return rh
+    if len(rh) == 0:
+        return lh
     result = WeightedMap([])
     for key, weight in lh.items():
         result[key] = weight * 0.5
@@ -35,11 +39,10 @@ def merge(lh, rh):
         norm += w * w
     result.norm = norm
     return result
-    
+
 def self_information(wm):
     si = 0.0
     for p in wm.values():
-        p = cnt / denominator
         si -= p * log(p, 2)
     return si
 
