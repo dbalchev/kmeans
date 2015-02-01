@@ -13,27 +13,27 @@ def dot_product(lh, rh):
 
 def cosine_distance(lh, rh):
     """
-    Прави нормализирано евклидово разстояние на lh и rh;
-    lh и rh трябва да са сортиран вектор от индекси на думи
+    Прави нормализирано косинусово разстояние на lh и rh;
+    lh и rh трябва да са WeightedMap-ове
     """
-
-    if not lh.norm or not rh.norm:
-        return 0
-    return 1 - dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
+    return 1 - cosine_similarity(lh, rh)
 
 def cosine_similarity(lh, rh):
     """
-    Изчислява similarity използвайки 1 - cosine_distance
+    Прави нормализирано косинусово подобие на lh и rh;
+    lh и rh трябва да са WeightedMap-ове
     """
     if not isinstance(lh, WeightedMap):
         raise ValueError("lh is not a WeightedMap")
     if not isinstance(rh, WeightedMap):
         raise ValueError("rh is not a WeightedMap")
-    return 1 - cosine_distance(lh, rh)
+    if not lh.norm or not rh.norm:
+        return 1
+    return dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
 
 def mutual_information_distance(lh, rh):
     return self_information(lh) + self_information(rh) \
-        - 0.5 * self_information(merge(lh, rh))
+        - self_information(merge(lh, rh))
 
 def euclidean_similarity(lh, rh):
     lh_norm = lh.norm or 1
