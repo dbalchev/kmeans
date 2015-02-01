@@ -47,7 +47,7 @@ class KMeans:
         self.min_text_len        = min_text_len
         self.iterations_callback = iterations_callback
 
-    def get_clusters(cores, corpus, old_cluster=None):
+    def get_clusters(self, cores, corpus, old_cluster=None):
         """
         Функция създаваща началните стойности нa клъстерите,
         като всеки от тях представлява центроид и ще преизчисли
@@ -84,13 +84,13 @@ class KMeans:
         corpus      = [FileRepr(label, WeightedMap.from_vec(list(sorted(text))))\
                         for label, text in text_seq if len(text) >= self.min_text_len]
         cores       = random.sample(corpus, self.n_clusters)
-        clusters, _ = get_clusters(cores, corpus)
+        clusters, _ = self.get_clusters(cores, corpus)
         changed     = True
         iteration   = 0
         while changed and iteration <= self.max_iterations:
             old_cluster = dict(chain.from_iterable(\
                 ((item.name, label) for item in cluster.items) for label, cluster in clusters.items()))
-            clusters, changed = get_clusters([FileRepr(name, cluster.center) \
+            clusters, changed = self.get_clusters([FileRepr(name, cluster.center) \
                 for name, cluster in clusters.items()], corpus, old_cluster=old_cluster)
             iteration += 1
 
@@ -99,4 +99,4 @@ class KMeans:
 
     def clusterize(self):
         vec = Vectorizer()
-        return kmeans(((filename, vec.vectorize_file(filename)) for filename in self.filename_seq))
+        return self.kmeans(((filename, vec.vectorize_file(filename)) for filename in self.filename_seq))
