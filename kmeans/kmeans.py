@@ -59,10 +59,10 @@ class KMeans:
         clusters = {core.name: Centroid(core.content) for core in cores}
         changed = False
         for item in corpus:
-            max_similarity = (-1, None)
+            max_similarity = (None, None)
             for label, cluster in clusters.items():
                 cur_similarity = self.similarity_method(cluster.center, item.content)
-                if cur_similarity > max_similarity[0]:
+                if not max_similarity[0] or cur_similarity > max_similarity[0]:
                     max_similarity = (cur_similarity, label)
 
             if max_similarity[1] is None:

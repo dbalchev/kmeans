@@ -123,12 +123,12 @@ class TFIDFTests(unittest.TestCase):
         self.tfidf = TFIDFDataBase(self.corpus)
 
     def test_tf(self):
-        self.assertEqual(self.tfidf.tf(0, "1"), 1)
-        self.assertEqual(self.tfidf.tf(1, "1"), 0.75)
+        self.assertEqual(self.tfidf.tf(0, self.corpus[0].content), 1)
+        self.assertEqual(self.tfidf.tf(1, self.corpus[0].content), 0.75)
         for i in [1, 2, 3, 4]:
-            self.assertEqual(self.tfidf.tf(i, "2"), 1)
-        self.assertEqual(self.tfidf.tf(5, "3"), 1)
-        self.assertEqual(self.tfidf.tf(3, "3"), 0.5)
+            self.assertEqual(self.tfidf.tf(i, self.corpus[1].content), 1)
+        self.assertEqual(self.tfidf.tf(5, self.corpus[2].content), 1)
+        self.assertEqual(self.tfidf.tf(3, self.corpus[2].content), 0.5)
     def test_idf(self):
         from math import log
         tests = [
@@ -142,11 +142,11 @@ class TFIDFTests(unittest.TestCase):
     def test_tfidf(self):
         from math import log
         tests = [
-            (0, "1", 1 * log(3 / 1, 2)),
-            (1, "1", 0.75 * log(3 / 2, 2)),
-            (0, "2", 0.5 * log(3 / 1, 2)),
-            (5, "3", 1 * log(3 / 1, 2))
+            (0, 0, 1 * log(3 / 1, 2)),
+            (1, 0, 0.75 * log(3 / 2, 2)),
+            (0, 1, 0.5 * log(3 / 1, 2)),
+            (5, 2, 1 * log(3 / 1, 2))
         ]
 
         for w, d, r in tests:
-            self.assertEqual(self.tfidf.tfidf(w, d), r)
+            self.assertEqual(self.tfidf.tfidf(w, self.corpus[d].content), r)

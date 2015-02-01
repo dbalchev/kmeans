@@ -38,6 +38,18 @@ class WeightedMap(dict):
         for w in self.values():
             self.norm += w * w
 
+    def __hash__(self):
+        return hash(id(self).to_bytes(4, "little"))
+
+    def __eq__(self, oth):
+        if self is oth:
+            return True
+        return super().__eq__(oth)
+
+    def __ne__(self, oth):
+        return not self == oth
+
+
     @staticmethod
     def from_vec(vec):
         if len(vec) == 0:

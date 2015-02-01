@@ -21,16 +21,19 @@ v1, v2 = (WeightedMap.from_vec(sorted(v)) for v in (v1, v2))
 # Testing kmeans
 from glob import iglob
 from itertools import islice, chain
-from kmeans import KMeans
+from kmeans import KMeans, TFIDFDataBase
+from cProfile import Profile
+
+profiler = Profile()
 
 files = list(islice(iglob("./reuters/training/*"), 1000))
 kmeans = KMeans(n_clusters=10, filename_seq=files,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
-
-clusters = kmeans.clusterize()
-print('======================')
-for cluster_name, cluster in clusters.items():
-	print(cluster_name, "has", len(cluster.items), "docs")
+#
+# clusters = kmeans.clusterize()
+# print('======================')
+# for cluster_name, cluster in clusters.items():
+# 	print(cluster_name, "has", len(cluster.items), "docs")
 	# for item in cluster.items:
 	# 	print('\t',item.name)
 #
@@ -43,9 +46,21 @@ for cluster_name, cluster in clusters.items():
 #         d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
 #         d["name"] = cu_item.name
 #         writer.writerow(d)
+profiler.enable()
+tfidf = TFIDFDataBase(kmeans.corpus)
+try:
+    print("clusterize")
+    kmeans.similarity_method = tfidf.euclidean_similarity
+    clusters = kmeans.clusterize()
+except KeyboardInterrupt:
+    print("interupted")
+else:
+    print('======================')
+    for cluster_name, cluster in clusters.items():
+	       print(cluster_name, "has", len(cluster.items), "docs")
+finally:
+   profiler.disable()
+   profiler.dump_stats("profile.txt")
+   print("we have profile")
 
-kmeans.similarity_method = euclidean_similarity
-clusters = kmeans.clusterize()
-print('======================')
-for cluster_name, cluster in clusters.items():
-	print(cluster_name, "has", len(cluster.items), "docs")
+# profiler.print_stats()
