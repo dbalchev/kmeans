@@ -28,6 +28,7 @@ profiler = Profile()
 
 files = list(islice(iglob("./reuters/training/*"), 1000))
 kmeans = KMeans(n_clusters=10, filename_seq=files,
+                max_iterations=10,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
 #
 # clusters = kmeans.clusterize()
@@ -48,6 +49,20 @@ kmeans = KMeans(n_clusters=10, filename_seq=files,
 #         writer.writerow(d)
 profiler.enable()
 tfidf = TFIDFDataBase(kmeans.corpus)
+# indices = [
+#     (0, 0),
+#     (1, 0),
+#     (0, 1),
+#     (1, 2),
+#     (2, 3),
+#     (1, 3),
+#     (1, 1)
+# ]
+# for i, j in indices:
+#     ic, jc = (kmeans.corpus[x].content for x in (i, j))
+#     print(tfidf.euclidean_similarity(ic, jc), cosine_similarity(ic, jc))
+#
+# exit()
 try:
     print("clusterize")
     kmeans.similarity_method = tfidf.euclidean_similarity
