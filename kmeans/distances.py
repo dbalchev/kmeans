@@ -18,7 +18,6 @@ def cosine_distance(lh, rh):
     """
     return 1 - cosine_similarity(lh, rh)
 
-
 def cosine_similarity(lh, rh):
     """
     Прави нормализирано косинусово подобие на lh и rh;
@@ -32,10 +31,9 @@ def cosine_similarity(lh, rh):
         return 1
     return dot_product(lh, rh) / sqrt(lh.norm * rh.norm)
 
-
 def mutual_information_distance(lh, rh):
     return self_information(lh) + self_information(rh) \
-        - 0.5 * self_information(merge(lh, rh))
+        - self_information(merge(lh, rh))
 
 def euclidean_similarity(lh, rh):
     lh_norm = lh.norm or 1
