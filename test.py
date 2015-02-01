@@ -1,5 +1,6 @@
-from kmeans.utils import Vectorizer, WeightedMap
 from kmeans.distances import cosine_similarity, mutual_information_distance, euclidean_similarity
+from kmeans.utils import WeightedMap
+from kmeans.vectorizers import Vectorizer
 # import kmeans
 
 vectorizer = Vectorizer()
@@ -20,10 +21,13 @@ v1, v2 = (WeightedMap.from_vec(sorted(v)) for v in (v1, v2))
 # Testing kmeans
 from glob import iglob
 from itertools import islice, chain
-from kmeans import clusterize
+from kmeans import KMeans
 
 files = list(islice(iglob("./reuters/training/*"), 1000))
-clusters = clusterize(10, files)
+kmeans = KMeans(n_clusters=10, filename_seq=files,
+				iterations_callback=lambda x: print("Done in", x, "iterations."))
+
+clusters = kmeans.clusterize()
 print('======================')
 for cluster_name, cluster in clusters.items():
 	print(cluster_name, "has", len(cluster.items), "docs")
@@ -40,8 +44,8 @@ for cluster_name, cluster in clusters.items():
 #         d["name"] = cu_item.name
 #         writer.writerow(d)
 
-files = list(islice(iglob("./reuters/training/*"), 1000))
-clusters = clusterize(10, files, similarity=euclidean_similarity)
+kmeans.similarity_method = euclidean_similarity
+clusters = kmeans.clusterize()
 print('======================')
 for cluster_name, cluster in clusters.items():
 	print(cluster_name, "has", len(cluster.items), "docs")

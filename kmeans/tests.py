@@ -5,7 +5,7 @@ from .distances import cosine_distance, dot_product, merge, self_information, eu
 from .utils import count_duplicates, WeightedMap
 
 
-class cosineDistanceTest(unittest.TestCase):
+class UtilityTest(unittest.TestCase):
     def test_count_dup(self):
         self.assertEqual(count_duplicates([1], 0), 1, "singleton")
         self.assertEqual(count_duplicates([1, 2], 0), 1, "different elements")
@@ -22,7 +22,7 @@ class cosineDistanceTest(unittest.TestCase):
             ([1, 1, 1, 2], {1:0.75, 2:0.25}),
         ]
         for vec, m in tests:
-            self.assertEqual(WeightedMap.from_vec(vec), m)
+            self.assertEqual(WeightedMap.from_vec(vec), m)        
 
     def test_dot(self):
         tests = [
@@ -42,6 +42,23 @@ class cosineDistanceTest(unittest.TestCase):
             self.assertEqual(r1, r2, message)
             self.assertEqual(r1, result, message)
 
+    def test_merge(self):
+        tests = [
+            ([], [], []),
+            ([], [1], [1]),
+            ([1,2,3], [4,5,6], [1,2,3,4,5,6]),
+            ([1,3,5], [2,4,6], [1,2,3,4,5,6])
+        ]
+        for lh, rh, result in tests:
+            lh, rh, result = map(WeightedMap.from_vec, (lh, rh, result))
+            r1 = merge(lh, rh)
+            r2 = merge(rh, lh)
+            message = "{}, {}".format(lh, rh)
+            self.assertEqual(r1, r2, message)
+            self.assertEqual(r1, result, message)
+
+
+class DistanceTest(unittest.TestCase):
     def test_euclidean_similarity(self):
         tests = [
             ([], [1,2,3], 0, "Empty sequence"),
@@ -78,20 +95,6 @@ class cosineDistanceTest(unittest.TestCase):
             self.assertEqual(r1, r2, message)
             self.assertEqual(r1, result, message)
 
-    def test_merge(self):
-        tests = [
-            ([], [], []),
-            ([], [1], [1]),
-            ([1,2,3], [4,5,6], [1,2,3,4,5,6]),
-            ([1,3,5], [2,4,6], [1,2,3,4,5,6])
-        ]
-        for lh, rh, result in tests:
-            lh, rh, result = map(WeightedMap.from_vec, (lh, rh, result))
-            r1 = merge(lh, rh)
-            r2 = merge(rh, lh)
-            message = "{}, {}".format(lh, rh)
-            self.assertEqual(r1, r2, message)
-            self.assertEqual(r1, result, message)
 
     def test_self_information(self):
         tests = [
