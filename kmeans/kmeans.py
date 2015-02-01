@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from itertools import chain
 import random
 
