@@ -41,11 +41,14 @@ class KMeans:
                  min_text_len=DEFAULT_MIN_TEXT_LEN,
                  iterations_callback=DEFAULT_ITERATIONS_CALLBACK):
         self.n_clusters          = n_clusters
-        self.filename_seq        = filename_seq
         self.similarity_method   = similarity_method
         self.max_iterations      = max_iterations
         self.min_text_len        = min_text_len
         self.iterations_callback = iterations_callback
+        self.vec = Vectorizer()
+        text_seq = ((filename, self.vec.vectorize_file(filename)) for filename in filename_seq)
+        self.corpus = [FileRepr(label, WeightedMap.from_vec(list(sorted(text))))\
+                        for label, text in text_seq if len(text) >= self.min_text_len]
 
     def get_clusters(self, cores, corpus, old_cluster=None):
         """
@@ -74,29 +77,22 @@ class KMeans:
 
         return clusters, changed
 
-    def kmeans(self, text_seq):
+    def clusterize(self):
         """
         Функция използваща k-means алогоритъм за клъстеризация на текстове
-        text_seq трябва да са двойки (label, text_vector), където text_vector е
         вектор върнат от Vectorizer
         similarity = similarity or default_similarity
         """
-        corpus      = [FileRepr(label, WeightedMap.from_vec(list(sorted(text))))\
-                        for label, text in text_seq if len(text) >= self.min_text_len]
-        cores       = random.sample(corpus, self.n_clusters)
-        clusters, _ = self.get_clusters(cores, corpus)
+        cores       = random.sample(self.corpus, self.n_clusters)
+        clusters, _ = self.get_clusters(cores, self.corpus)
         changed     = True
         iteration   = 0
         while changed and iteration <= self.max_iterations:
             old_cluster = dict(chain.from_iterable(\
                 ((item.name, label) for item in cluster.items) for label, cluster in clusters.items()))
             clusters, changed = self.get_clusters([FileRepr(name, cluster.center) \
-                for name, cluster in clusters.items()], corpus, old_cluster=old_cluster)
+                for name, cluster in clusters.items()], self.corpus, old_cluster=old_cluster)
             iteration += 1
 
         self.iterations_callback(iteration)
         return clusters
-
-    def clusterize(self):
-        vec = Vectorizer()
-        return self.kmeans(((filename, vec.vectorize_file(filename)) for filename in self.filename_seq))
