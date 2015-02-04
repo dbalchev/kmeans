@@ -62,6 +62,9 @@ class KMeans:
             max_similarity = (None, None)
             for label, cluster in clusters.items():
                 cur_similarity = self.similarity_method(cluster.center, item.content)
+                # if label == item.name:
+                #     max_similarity = (cur_similarity, label)
+                #     break
                 if not max_similarity[0] or cur_similarity > max_similarity[0]:
                     max_similarity = (cur_similarity, label)
 

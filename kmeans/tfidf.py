@@ -26,6 +26,8 @@ class TFIDFDataBase:
         return max(document.values())
 
     def tf(self, word_index, document):
+        if len(document) == 0:
+            return 0
         return document[word_index] \
             / self.mtf(document)
 
@@ -49,6 +51,12 @@ class TFIDFDataBase:
         # r_norm  = len(rh) / len(key_set)
         lh_dot = self.dot_square(lh)
         rh_dot = self.dot_square(rh)
+        if not lh_dot:
+            if not rh_dot:
+                return 1
+            return 0
+        if not rh_dot:
+            return 0
         norm = lh_dot - 2 * self.tfidf_dot(lh, rh) + rh_dot
         denominator = lh_dot * rh_dot
         if abs(denominator) < EPS:
@@ -61,6 +69,27 @@ class TFIDFDataBase:
             print(norm, denominator)
             raise
 
+    def kl_similarity(self, lh, rh):
+        if not lh and not rh:
+            return 1
+        slen = len(lh) + len(rh)
+        cl, cr = (len(x) / slen for x in (lh, rh))
+        key_set = set(chain(lh.keys(), rh.keys()))
+
+        result = 0
+        for key in key_set:
+            lw = self.tfidf(key, lh)
+            rw = self.tfidf(key, rh)
+            denominator = lw + rw
+            result += cl * TFIDFDataBase._d_kl(lw, denominator)\
+                + cr * TFIDFDataBase._d_kl(rw, denominator)
+
+        return result
+    @staticmethod
+    def _d_kl(wa, wb):
+        if abs(wa) < EPS:
+            return 0
+        return wa * log(wa / wb, 2)
     @staticmethod
     def _generate_idf(corpus):
         word_counter = Counter()

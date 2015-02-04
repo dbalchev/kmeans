@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, '.')
 from kmeans.distances import cosine_similarity, mutual_information_distance, euclidean_similarity
 from kmeans.utils import WeightedMap
 from kmeans.vectorizers import Vectorizer
@@ -23,30 +25,28 @@ from glob import iglob
 from itertools import islice, chain
 from kmeans import KMeans, TFIDFDataBase
 from cProfile import Profile
+import csv
 
 profiler = Profile()
 
 files = list(islice(iglob("./reuters/training/*"), 1000))
+import random
+initstate = random.getstate()
 kmeans = KMeans(n_clusters=10, filename_seq=files,
-                max_iterations=10,
+                max_iterations=100,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
 #
-# clusters = kmeans.clusterize()
-# print('======================')
+clusters = kmeans.clusterize()
+random.setstate(initstate)
+print('======================')
 # for cluster_name, cluster in clusters.items():
 # 	print(cluster_name, "has", len(cluster.items), "docs")
-	# for item in cluster.items:
-	# 	print('\t',item.name)
-#
-# items = list(chain.from_iterable(cluster.items for cluster in clusters.values()))
-# import csv
-# with open("results.csv", "w") as csv_file:
-#     writer = csv.DictWriter(csv_file, ["name"] + [item.name for item in items])
-#     writer.writeheader()
-#     for cu_item in items:
-#         d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
-#         d["name"] = cu_item.name
-#         writer.writerow(d)
+# 	for item in cluster.items:
+# 		print('\t',item.name)
+
+for cluster_name, cluster in clusters.items():
+    print(cluster_name, "has", len(cluster.items), "docs")
+
 profiler.enable()
 tfidf = TFIDFDataBase(kmeans.corpus)
 # indices = [
@@ -65,14 +65,27 @@ tfidf = TFIDFDataBase(kmeans.corpus)
 # exit()
 try:
     print("clusterize")
-    kmeans.similarity_method = tfidf.euclidean_similarity
+    kmeans.similarity_method = tfidf.kl_similarity
     clusters = kmeans.clusterize()
+    # for cluster_name, cluster in clusters.items():
+    # 	print(cluster_name, "has", len(cluster.items), "docs")
+    # 	for item in cluster.items:
+    # 		print('\t',item.name)
+    items = list(chain.from_iterable(cluster.items for cluster in clusters.values()))
+    # with open("results.csv", "w") as csv_file:
+    #     writer = csv.DictWriter(csv_file, ["name"] + [item.name for item in items])
+    #     writer.writeheader()
+    #     for cu_item in items:
+    #         d = {item.name:cosine_similarity(item.content, cu_item.content) for item in items}
+    #         d["name"] = cu_item.name
+    #         writer.writerow(d)
+
 except KeyboardInterrupt:
     print("interupted")
 else:
     print('======================')
     for cluster_name, cluster in clusters.items():
-	       print(cluster_name, "has", len(cluster.items), "docs")
+        print(cluster_name, "has", len(cluster.items), "docs")
 finally:
    profiler.disable()
    profiler.dump_stats("profile.txt")
