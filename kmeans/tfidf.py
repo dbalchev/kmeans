@@ -16,19 +16,26 @@ class TFIDFDataBase:
         self.mtf = lru_cache(maxsize=mtf_cache_size)(self._mtf_generate)
         self.idf = TFIDFDataBase._generate_idf(corpus)
         #TODO да си има собствен параметър за максимален размер
-        self.dot_square = lru_cache(maxsize=mtf_cache_size)(self._dot_square)
+        self.dot_square = lru_cache(maxsize=mtf_cache_size) \
+            (self._dot_square)
+        self.tfidf_sum = lru_cache(maxsize=mtf_cache_size) \
+            (self._tfidf_sum)
 
     def tfidf(self, word_index, document):
         return self.tf(word_index, document) \
             * self.idf[word_index]
+
+    def _tfidf_sum(self, document):
+        return sum(self.tfidf(word, document) \
+            for word in document.keys())
 
     def _mtf_generate(self, document):
         return max(document.values())
 
     def tf(self, word_index, document):
         if len(document) == 0:
-            return 0
-        return document[word_index] \
+            return 0.5
+        return 0.5 + 0.5 * document[word_index] \
             / self.mtf(document)
 
     def _dot_square(self, document):
@@ -42,8 +49,13 @@ class TFIDFDataBase:
         if len(lh) > len(rh):
             lh, rh = rh, lh
         result = 0
+        rh_tfidf_sum = self.tfidf_sum(rh)
         for word in lh.keys():
-            result += self.tfidf(word, lh) * self.tfidf(word, rh)
+            rh_tfidf = self.tfidf(word, rh)
+            rh_tfidf_sum -= rh_tfidf
+            result += self.tfidf(word, lh) * rh_tfidf
+        print("\n", rh_tfidf_sum)
+        result += 0.5 * rh_tfidf_sum
         return result
 
     def euclidean_similarity(self, lh, rh):
@@ -66,6 +78,9 @@ class TFIDFDataBase:
         try:
             return 1 - sqrt(norm / denominator)
         except ValueError:
+            print()
+            print(lh)
+            print(rh)
             print(norm, denominator)
             raise
 

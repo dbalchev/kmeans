@@ -150,3 +150,34 @@ class TFIDFTests(unittest.TestCase):
 
         for w, d, r in tests:
             self.assertEqual(self.tfidf.tfidf(w, self.corpus[d].content), r)
+
+    def test_euclidean_similarity(self):
+        def naive_similarity(lh, rh):
+            from itertools import chain
+            from math import sqrt
+            from .tfidf import EPS
+            keyset = set(chain(lh.keys(), rh.keys()))
+            square = lambda x: x * x
+            tfidf = self.tfidf.tfidf
+            dot_square = self.tfidf.dot_square
+            norm = sum(square(tfidf(word, lh) - tfidf(word, rh)) \
+                for word in keyset)
+            denominator = dot_square(lh) * dot_square(rh)
+            if abs(denominator) < EPS:
+                return 1
+            if abs(norm) < EPS:
+                norm = 0
+            try:
+                return 1 - sqrt(norm / denominator)
+            except ValueError:
+                print(norm, denominator)
+                raise
+
+        fast_similarity = self.tfidf.euclidean_similarity
+        docs = [fr.content for fr in self.corpus]
+        for lh in docs:
+            for rh in docs:
+                self.assertEqual(
+                    fast_similarity(lh, rh), \
+                    naive_similarity(lh, rh), \
+                    "\nlh = {}\nrh = {}".format(lh, rh))
