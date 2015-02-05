@@ -70,6 +70,10 @@ class TFIDFDataBase:
         if not rh_dot:
             return 0
         norm = lh_dot - 2 * self.tfidf_dot(lh, rh) + rh_dot
+        for word in lh:
+            if word not in rh:
+                t = self.tfidf(word, rh)
+                norm += t * t
         denominator = lh_dot * rh_dot
         if abs(denominator) < EPS:
             return 1
