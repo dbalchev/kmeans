@@ -65,7 +65,7 @@ tfidf = TFIDFDataBase(kmeans.corpus)
 # exit()
 try:
     print("clusterize")
-    kmeans.similarity_method = tfidf.kl_similarity
+    kmeans.similarity_method = tfidf.euclidean_similarity
     clusters = kmeans.clusterize()
     # for cluster_name, cluster in clusters.items():
     # 	print(cluster_name, "has", len(cluster.items), "docs")
