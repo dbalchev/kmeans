@@ -168,7 +168,6 @@ class TFIDFTests(unittest.TestCase):
                     naive_dot(lh, rh), \
                     "\nlh = {}\nrh = {}".format(lh, rh))
 
-    @unittest.skip("first greenify test_euclidean_dot")
     def test_euclidean_similarity(self):
         def naive_similarity(lh, rh):
             from itertools import chain

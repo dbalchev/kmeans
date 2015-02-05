@@ -26,7 +26,7 @@ class TFIDFDataBase:
             * self.idf[word_index]
 
     def _tfidf_sum(self, document):
-        return sum(self.tfidf(word, document) \
+        return sum(self.tfidf(word, document) * self.idf[word] \
             for word in document.keys())
 
     def _mtf_generate(self, document):
@@ -53,9 +53,8 @@ class TFIDFDataBase:
         for word in lh.keys():
             rh_tfidf = self.tfidf(word, rh)
             if word in rh:
-                rh_tfidf_sum -= rh_tfidf
+                rh_tfidf_sum -= rh_tfidf * self.idf[word]
             result += self.tfidf(word, lh) * rh_tfidf
-        print("\n", rh_tfidf_sum)
         result += 0.5 * rh_tfidf_sum
         return result
 
