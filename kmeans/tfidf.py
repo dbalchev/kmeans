@@ -73,6 +73,8 @@ class TFIDFDataBase:
     def euclidean_similarity(self, lh, rh):
         # l_norm  = len(lh) / len(key_set)
         # r_norm  = len(rh) / len(key_set)
+        if len(lh) > len(rh):
+            lh, rh = rh, lh
         lh_dot = self.dot_square(lh)
         rh_dot = self.dot_square(rh)
         if not lh_dot:
