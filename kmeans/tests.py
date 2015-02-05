@@ -151,6 +151,24 @@ class TFIDFTests(unittest.TestCase):
         for w, d, r in tests:
             self.assertEqual(self.tfidf.tfidf(w, self.corpus[d].content), r)
 
+    def test_euclidean_dot(self):
+        def naive_dot(lh, rh):
+            from itertools import chain
+            keyset = set(chain(lh.keys(), rh.keys()))
+            tfidf = self.tfidf.tfidf
+            return sum(tfidf(word, lh) * tfidf(word, rh) \
+                for word in keyset)
+
+        fast_dot = self.tfidf.tfidf_dot
+        docs = [fr.content for fr in self.corpus]
+        for lh in docs:
+            for rh in docs:
+                self.assertEqual(
+                    fast_dot(lh, rh), \
+                    naive_dot(lh, rh), \
+                    "\nlh = {}\nrh = {}".format(lh, rh))
+
+    @unittest.skip("first greenify test_euclidean_dot")
     def test_euclidean_similarity(self):
         def naive_similarity(lh, rh):
             from itertools import chain

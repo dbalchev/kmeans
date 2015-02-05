@@ -52,7 +52,8 @@ class TFIDFDataBase:
         rh_tfidf_sum = self.tfidf_sum(rh)
         for word in lh.keys():
             rh_tfidf = self.tfidf(word, rh)
-            rh_tfidf_sum -= rh_tfidf
+            if word in rh:
+                rh_tfidf_sum -= rh_tfidf
             result += self.tfidf(word, lh) * rh_tfidf
         print("\n", rh_tfidf_sum)
         result += 0.5 * rh_tfidf_sum
