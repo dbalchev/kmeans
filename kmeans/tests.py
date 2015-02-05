@@ -194,7 +194,7 @@ class TFIDFTests(unittest.TestCase):
         docs = [fr.content for fr in self.corpus]
         for lh in docs:
             for rh in docs:
-                self.assertEqual(
+                self.assertAlmostEqual(
                     fast_similarity(lh, rh), \
                     naive_similarity(lh, rh), \
-                    "\nlh = {}\nrh = {}".format(lh, rh))
+                    msg="\nlh = {}\nrh = {}".format(lh, rh))

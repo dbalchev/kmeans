@@ -5,6 +5,8 @@ from functools import lru_cache
 from collections import Counter, defaultdict
 from math import log, sqrt
 from weakref import ref
+
+from .utils import square
 EPS = 1e-9
 class TFIDFDataBase:
     DEFAULT_MTF_CACHE_SIZE  = 512 * 1024
@@ -20,6 +22,8 @@ class TFIDFDataBase:
             (self._dot_square)
         self.tfidf_sum = lru_cache(maxsize=mtf_cache_size) \
             (self._tfidf_sum)
+        self.missing_sum = lru_cache(maxsize=mtf_cache_size) \
+            (self._missing_sum)
 
     def tfidf(self, word_index, document):
         return self.tf(word_index, document) \
@@ -28,6 +32,14 @@ class TFIDFDataBase:
     def _tfidf_sum(self, document):
         return sum(self.tfidf(word, document) * self.idf[word] \
             for word in document.keys())
+
+    def _missing_sum(self, document):
+        """
+        Сумата на квадратите на tfidf на всяка дума в документа,
+        изчислена при tf == 0.5 т.е. при term frequency 0
+        """
+        return sum(0.25 * square(self.idf[word]) \
+            for word in document)
 
     def _mtf_generate(self, document):
         return max(document.values())
@@ -70,10 +82,16 @@ class TFIDFDataBase:
         if not rh_dot:
             return 0
         norm = lh_dot - 2 * self.tfidf_dot(lh, rh) + rh_dot
+        norm += self.missing_sum(rh)
         for word in lh:
-            if word not in rh:
+            if word in rh:
+                norm -= 0.25 * square(self.idf[word])
+            else:
                 t = self.tfidf(word, rh)
                 norm += t * t
+        # for word in rh:
+        #     if word not in lh:
+        #         norm += square(self.tfidf(word, lh))
         denominator = lh_dot * rh_dot
         if abs(denominator) < EPS:
             return 1

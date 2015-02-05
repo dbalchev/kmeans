@@ -66,3 +66,6 @@ class WeightedMap(dict):
 
     def __missing__(self, key):
         return 0.0
+
+def square(x):
+    return x * x
