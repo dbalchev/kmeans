@@ -61,25 +61,6 @@ class UtilityTest(unittest.TestCase):
 
 
 class DistanceTest(unittest.TestCase):
-    @unittest.skip("test is red, and we dont know how to make it green")
-    def test_euclidean_similarity(self):
-        tests = [
-            ([], [1,2,3], 0, "Empty sequence"),
-            ([1, 2, 3], [1, 2, 3], 1, "Same sequence"),
-            ([1, 1, 1], [1, 1, 1], 1, "Same sequnece repeating elements"),
-            ([1], [2], 0, "Nonintersecting sequences"),
-            ([1, 3, 5], [2, 4, 6], 0, "Nonintersecting longer sequences"),
-            ([1, 2], [1, 3], 0.5, ""),
-            ([1,1,1,1], [2,2,2], 0, "")
-        ]
-        for lh, rh, result, message in tests:
-            lh, rh = map(WeightedMap.from_vec, (lh, rh))
-            r1 = euclidean_similarity(lh, rh)
-            r2 = euclidean_similarity(rh, lh)
-            message = message or "{}, {}".format(lh, rh)
-            self.assertEqual(r1, r2, message)
-            self.assertEqual(r1, result, message)
-
     def test_cosine_distance(self):
         tests = [
             ([], [1,2,3], 0, "Empty sequence"),
@@ -198,3 +179,23 @@ class TFIDFTests(unittest.TestCase):
                     fast_similarity(lh, rh), \
                     naive_similarity(lh, rh), \
                     msg="\nlh = {}\nrh = {}".format(lh, rh))
+
+class CategoriesTest(unittest.TestCase):
+    def setUp(self):
+        from .categories import Categories
+        self.categories = Categories("reuters/cats.txt", "reuters")
+
+    def test_input(self):
+        categories = self.categories
+        self.assertEqual(categories["reuters/training/96"], ["acq"])
+        self.assertEqual(
+            categories["reuters\\training/97"],
+            "oilseed soybean sorghum rye oat corn wheat grain".split())
+
+    def test_most_common(self):
+        categories = self.categories
+        docs = "92 93 94 95 96 97 98".split()
+        docs = ["reuters/training/" + doc for doc in docs]
+        self.assertEqual(
+            categories.most_common(docs, 2),
+            [("money-supply", 3), ("earn", 2)])

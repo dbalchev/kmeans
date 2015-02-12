@@ -3,12 +3,13 @@ sys.path.insert(0, '.')
 from kmeans.distances import cosine_similarity, mutual_information_distance, euclidean_similarity
 from kmeans.utils import WeightedMap
 from kmeans.vectorizers import Vectorizer
+from kmeans.categories import Categories
 # import kmeans
 
-vectorizer = Vectorizer()
-file1, file2 = "reuters/training/1", "reuters/training/5"
-v1, v2 = (list(vectorizer.vectorize_file(f)) for f in (file1, file2))
-v1, v2 = (WeightedMap.from_vec(sorted(v)) for v in (v1, v2))
+# file1, file2 = "reuters/training/1", "reuters/training/5"
+# vectorizer = Vectorizer()
+# v1, v2 = (list(vectorizer.vectorize_file(f)) for f in (file1, file2))
+# v1, v2 = (WeightedMap.from_vec(sorted(v)) for v in (v1, v2))
 
 # print(v1)
 # print(v2)
@@ -26,13 +27,13 @@ from itertools import islice, chain
 from kmeans import KMeans, TFIDFDataBase
 from cProfile import Profile
 import csv
+import random
 
 profiler = Profile()
-
-files = list(islice(iglob("./reuters/training/*"), 10000))
-import random
+categories = Categories("./reuters/cats.txt", "./reuters")
+files = list(islice(iglob("./reuters/training/*"), 1000))
 initstate = random.getstate()
-kmeans = KMeans(n_clusters=50, filename_seq=files,
+kmeans = KMeans(n_clusters=15, filename_seq=files,
                 max_iterations=100,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
 #
@@ -46,7 +47,9 @@ print('======================')
 
 for cluster_name, cluster in clusters.items():
     print(cluster_name, "has", len(cluster.items), "docs")
+    print(categories.most_common((fr.name for fr in cluster.items), 5))
 
+exit()
 profiler.enable()
 tfidf = TFIDFDataBase(kmeans.corpus)
 # indices = [
