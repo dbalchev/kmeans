@@ -29,10 +29,10 @@ import csv
 
 profiler = Profile()
 
-files = list(islice(iglob("./reuters/training/*"), 1000))
+files = list(islice(iglob("./reuters/training/*"), 10000))
 import random
 initstate = random.getstate()
-kmeans = KMeans(n_clusters=10, filename_seq=files,
+kmeans = KMeans(n_clusters=50, filename_seq=files,
                 max_iterations=100,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
 #
