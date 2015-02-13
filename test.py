@@ -31,9 +31,9 @@ import random
 
 profiler = Profile()
 categories = Categories("./reuters/cats.txt", "./reuters")
-files = list(islice(iglob("./reuters/training/*"), 1000))
+files = list(iglob("./reuters/training/*"))
 initstate = random.getstate()
-kmeans = KMeans(n_clusters=15, filename_seq=files,
+kmeans = KMeans(n_clusters=30, filename_seq=files,
                 max_iterations=100,
 				iterations_callback=lambda x: print("Done in", x, "iterations."))
 #
@@ -45,10 +45,14 @@ print('======================')
 # 	for item in cluster.items:
 # 		print('\t',item.name)
 
-for cluster_name, cluster in clusters.items():
-    print(cluster_name, "has", len(cluster.items), "docs")
-    print(categories.most_common((fr.name for fr in cluster.items), 5))
-
+with open("results.txt", "w") as outp:
+    for cluster_name, cluster in clusters.items():
+        outp.write(
+            "{} has {} docs\n{}\n".format(
+                cluster_name, len(cluster.items),
+                categories.most_common(
+                    (fr.name for fr in cluster.items),
+                    5)))
 exit()
 profiler.enable()
 tfidf = TFIDFDataBase(kmeans.corpus)
